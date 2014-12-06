@@ -56,7 +56,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	private static final String TAG = "BluetoothChat";
 	private static final boolean D = true;
 
-	// Message types sent from the BluetoothChatService Handler 
+	// Message types sent from the BluetoothChatService Handler //
 	public static final int MESSAGE_STATE_CHANGE = 1;
 	public static final int MESSAGE_READ = 2;
 	public static final int MESSAGE_WRITE = 3;
