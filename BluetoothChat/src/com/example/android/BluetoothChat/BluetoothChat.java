@@ -16,7 +16,6 @@
 
 package com.example.android.BluetoothChat;
 
-import android.R.string;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
