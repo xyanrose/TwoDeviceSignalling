@@ -16,6 +16,7 @@
 
 package com.example.android.BluetoothChat;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import android.app.ActionBar;
@@ -26,6 +27,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -50,6 +52,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,13 +81,10 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	private static final int REQUEST_ENABLE_BT = 3;
 
 	// Layout Views
-	private ListView mConversationView;
 	private Button mSendButton;
 
 	// Name of the connected device
 	private String mConnectedDeviceName = null;
-	// Array adapter for the conversation thread
-	private ArrayAdapter<String> mConversationArrayAdapter;
 	// String buffer for outgoing messages
 	private StringBuffer mOutStringBuffer;
 	// Local Bluetooth adapter
@@ -164,7 +164,11 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			finish();
 			return;
 		}
-		
+		try {
+			((ImageView) findViewById(R.id.flag_detected)).setImageBitmap(BitmapFactory.decodeStream(getAssets().open("base.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		build_help_dialog();
 	}
 
@@ -209,13 +213,13 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	}
 
 	private void setupChat() {
-		Log.d(TAG, "setupChat()");
+//		Log.d(TAG, "setupChat()");
 
 		// Initialize the array adapter for the conversation thread
-		mConversationArrayAdapter = new ArrayAdapter<String>(this,
-				R.layout.message);
-		mConversationView = (ListView) findViewById(R.id.in);
-		mConversationView.setAdapter(mConversationArrayAdapter);
+//		mConversationArrayAdapter = new ArrayAdapter<String>(this,
+//				R.layout.message);
+//		mConversationView = (ListView) findViewById(R.id.in);
+//		mConversationView.setAdapter(mConversationArrayAdapter);
 
 //		// Initialize the compose field with a listener for the return key
 //		mOutEditText = (EditText) findViewById(R.id.edit_text_out);
@@ -342,7 +346,6 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 //							mConnectedDeviceName));
 					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.bt_conn);
 					((TextView) findViewById(R.id.bconnto)).setText(mConnectedDeviceName.toString());
-					mConversationArrayAdapter.clear();
 					break;
 				case BluetoothChatService.STATE_CONNECTING:
 //					setStatus(R.string.title_connecting);
@@ -360,7 +363,6 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 				byte[] writeBuf = (byte[]) msg.obj;
 				// construct a string from the buffer
 				String writeMessage = new String(writeBuf);
-				mConversationArrayAdapter.add("Me:  " + writeMessage);
 				break;
 			case MESSAGE_READ:
 				byte[] readBuf = (byte[]) msg.obj;
@@ -469,117 +471,106 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		Toast.makeText(this, slaveString,
 				Toast.LENGTH_SHORT).show();
 		String switchVar = masterString+" "+slaveString;
+		
+		String result = "";
 		//right hand master, left hand slave
 		if (switchVar.equals("SE S")){
 			//A
-			Toast.makeText(this, "A",
-					Toast.LENGTH_SHORT).show();
+			result = "a";
 		}else if(switchVar.equals("E S")){
 			//B
-			Toast.makeText(this, "B",
-					Toast.LENGTH_SHORT).show();
+			result = "b";
 		}else if(switchVar.equals("NE S")){
 			//C
-			Toast.makeText(this, "C",
-					Toast.LENGTH_SHORT).show();
+			result = "c";
 		}else if(switchVar.equals("N S")){
 			//D
-			Toast.makeText(this, "D",
-					Toast.LENGTH_SHORT).show();
+			result = "d";
 		}else if(switchVar.equals("S NW")){
 			//E
-			Toast.makeText(this, "E",
-					Toast.LENGTH_SHORT).show();
+			result = "e";
 		}else if(switchVar.equals("S W")){
 			//F
-			Toast.makeText(this, "F",
-					Toast.LENGTH_SHORT).show();
+			result = "f";
 		}else if(switchVar.equals("S SW")){
 			//G
-			Toast.makeText(this, "G",
-					Toast.LENGTH_SHORT).show();
+			result = "g";
 		}else if(switchVar.equals("E SE")){
 			//H
-			Toast.makeText(this, "H",
-					Toast.LENGTH_SHORT).show();
+			result = "h";
 		}else if(switchVar.equals("SE NE")){
 			//I
-			Toast.makeText(this, "I",
-					Toast.LENGTH_SHORT).show();
+			result = "i";
 		}else if(switchVar.equals("N W")){
 			//J
-			Toast.makeText(this, "J",
-					Toast.LENGTH_SHORT).show();
+			result = "j";
 		}else if(switchVar.equals("SE N")){
 			//K
-			Toast.makeText(this, "K",
-					Toast.LENGTH_SHORT).show();
+			result = "k";
 		}else if(switchVar.equals("SE NW")){
 			//L
-			Toast.makeText(this, "L",
-					Toast.LENGTH_SHORT).show();
+			result = "l";
 		}else if(switchVar.equals("SE W")){
 			//M
-			Toast.makeText(this, "M",
-					Toast.LENGTH_SHORT).show();
+			result = "m";
 		}else if(switchVar.equals("SE SW")){
 			//N
-			Toast.makeText(this, "N",
-					Toast.LENGTH_SHORT).show();
+			result = "n";
 		}else if(switchVar.equals("E NE")){
 			//O
-			Toast.makeText(this, "O",
-					Toast.LENGTH_SHORT).show();
+			result = "o";
 		}else if(switchVar.equals("E N")){
 			//P
-			Toast.makeText(this, "P",
-					Toast.LENGTH_SHORT).show();
+			result = "p";
 		}else if(switchVar.equals("E NW")){
 			//Q
-			Toast.makeText(this, "Q",
-					Toast.LENGTH_SHORT).show();
+			result = "q";
 		}else if(switchVar.equals("E W")){
 			//R
-			Toast.makeText(this, "R",
-					Toast.LENGTH_SHORT).show();
+			result = "r";
 		}else if(switchVar.equals("E SW")){
 			//S
-			Toast.makeText(this, "S",
-					Toast.LENGTH_SHORT).show();
+			result = "s";
 		}else if(switchVar.equals("NE N")){
 			//T
-			Toast.makeText(this, "T",
-					Toast.LENGTH_SHORT).show();
+			result = "t";
 		}else if(switchVar.equals("NE NW")){
 			//U
-			Toast.makeText(this, "U",
-					Toast.LENGTH_SHORT).show();
+			result = "u";
 		}else if(switchVar.equals("N SW")){
 			//V
-			Toast.makeText(this, "V",
-					Toast.LENGTH_SHORT).show();
+			result = "v";
 		}else if(switchVar.equals("NW W")){
 			//W
-			Toast.makeText(this, "W",
-					Toast.LENGTH_SHORT).show();
+			result = "w";
 		}else if(switchVar.equals("NW SW")){
 			//X
-			Toast.makeText(this, "X",
-					Toast.LENGTH_SHORT).show();
+			result = "x";
 		}else if(switchVar.equals("NE W")){
 			//Y
-			Toast.makeText(this, "Y",
-					Toast.LENGTH_SHORT).show();
+			result = "y";
 		}else if(switchVar.equals("SW W")){
 			//Z
-			Toast.makeText(this, "Z",
-					Toast.LENGTH_SHORT).show();
+			result = "z";
 		}else if(switchVar.equals("S S")){
 			//Space
-			Toast.makeText(this, "Space",
-					Toast.LENGTH_SHORT).show();
+			result = "space";
 		}
 		
+		if(!result.equals("")) {
+			try {
+				((ImageView) findViewById(R.id.flag_detected)).setImageBitmap(BitmapFactory.decodeStream(getAssets().open(result+".png")));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			try {
+				((ImageView) findViewById(R.id.flag_detected)).setImageBitmap(BitmapFactory.decodeStream(getAssets().open("base.png")));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		
 	}
 

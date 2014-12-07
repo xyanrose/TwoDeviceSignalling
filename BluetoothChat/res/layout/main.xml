@@ -75,12 +75,13 @@
 	        android:textSize="15sp"
 	        android:text="@string/flag" />
         
-        <ListView
-	        android:id="@+id/in"
+        <ImageView
+	        android:id="@+id/flag_detected"
+	        android:contentDescription="@string/flag"
 	        android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-	        android:stackFromBottom="true"
-	        android:transcriptMode="alwaysScroll" />
+	        android:layout_height="match_parent"
+	        android:layout_marginTop="10dp"
+	        android:gravity="center" />
         
     </LinearLayout>
     
