@@ -122,10 +122,10 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		// Set up SensorManager and accelerometer
 		SensorManager manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-		Sensor accelerometer = manager.getSensorList(Sensor.TYPE_ACCELEROMETER)
+		Sensor accelerometer = manager.getSensorList(Sensor.TYPE_LINEAR_ACCELERATION)
 				.get(0);
 		manager.registerListener(this, accelerometer,
-				SensorManager.SENSOR_DELAY_NORMAL);
+				SensorManager.SENSOR_DELAY_FASTEST);
 
 		// button
 		ultraButton2001 = (Button) findViewById(R.id.ultraButton2001);
@@ -441,17 +441,21 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		HashMap<String, Integer> h1 = new HashMap<String,Integer>();
 		
 		//get most common direction for master
+		int length = 0;
 		for (String s:masterArr){
-			if (h1.containsKey(s)){
-				h1.put(s, h1.get(s)+1);
+			length+=1;
+		}
+		for (int i = 0; i<length*.85;i++){
+			if (h1.containsKey(masterArr[i])){
+				h1.put(masterArr[i], h1.get(masterArr[i])+1);
 			}else{
-				h1.put(s, 1);
+				h1.put(masterArr[i], 1);
 			}
 		}
 		int max = 0;
 		String returnString = "";
 		for (String s: h1.keySet()){
-			if(h1.get(s)>max){
+			if(h1.get(s)>max && !s.equals("NONE")){
 				max = h1.get(s);
 				returnString = s;
 			}
@@ -466,9 +470,9 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		/*slaveString was processed before sending from slave phone*/
 		slaveString = slaveString2;
 		
-		Toast.makeText(this, masterString,
+		Toast.makeText(this, "Right Hand: "+masterString,
 				Toast.LENGTH_SHORT).show();
-		Toast.makeText(this, slaveString,
+		Toast.makeText(this, "Left Hand: "+slaveString,
 				Toast.LENGTH_SHORT).show();
 		String switchVar = masterString+" "+slaveString;
 		
@@ -642,32 +646,37 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 		history[0] = event.values[0];
 		history[1] = event.values[1];
-
-		if (xChange > 1) {
-			if (yChange > 1) {
+		direction = "NONE";
+		double setting = .7;
+		if (xChange > setting) {
+			if (yChange > setting) {
 				direction = "NE";
-			} else if (yChange < -1) {
+			} else if (yChange < -setting) {
 				direction = "SE";
 			} else {
 				direction = "E";
 			}
-		} else if (xChange < -1) {
-			if (yChange > 1) {
+		} else if (xChange < -setting) {
+			if (yChange > setting) {
 				direction = "NW";
-			} else if (yChange < -1) {
+			} else if (yChange < -setting) {
 				direction = "SW";
 			} else {
 				direction = "W";
 			}
 		} else {
-			if (yChange > 1) {
+			if (yChange > setting) {
 				direction = "N";
-			} else if (yChange < -1) {
+			} else if (yChange < -setting) {
 				direction = "S";
 			} else {
 				// direction = "NONE";
 			}
 		}
+		if (!direction.equals("NONE")){
+			Log.d(TAG, direction);
+		}
+		
 	}
 
 	public void startTask() {
@@ -676,6 +685,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			
 			@Override
 			protected Void doInBackground(Void... params) {
+				masterString = "";
 				
 				if (buttonDepressed) {
 					while (buttonDepressed) {
