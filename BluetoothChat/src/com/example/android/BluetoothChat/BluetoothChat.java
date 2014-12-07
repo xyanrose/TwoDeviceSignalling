@@ -18,10 +18,13 @@ package com.example.android.BluetoothChat;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -31,6 +34,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -69,12 +73,10 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 	// Intent request codes
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
-	private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
 	private static final int REQUEST_ENABLE_BT = 3;
 
 	// Layout Views
 	private ListView mConversationView;
-	private EditText mOutEditText;
 	private Button mSendButton;
 
 	// Name of the connected device
@@ -155,6 +157,8 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			finish();
 			return;
 		}
+		
+		build_help_dialog();
 	}
 
 	@Override
@@ -206,20 +210,20 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		mConversationView = (ListView) findViewById(R.id.in);
 		mConversationView.setAdapter(mConversationArrayAdapter);
 
-		// Initialize the compose field with a listener for the return key
-		mOutEditText = (EditText) findViewById(R.id.edit_text_out);
-		mOutEditText.setOnEditorActionListener(mWriteListener);
-
-		// Initialize the send button with a listener that for click events
-		mSendButton = (Button) findViewById(R.id.button_send);
-		mSendButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				// Send a message using content of the edit text widget
-				TextView view = (TextView) findViewById(R.id.edit_text_out);
-				String message = view.getText().toString();
-				sendMessage(message);
-			}
-		});
+//		// Initialize the compose field with a listener for the return key
+//		mOutEditText = (EditText) findViewById(R.id.edit_text_out);
+//		mOutEditText.setOnEditorActionListener(mWriteListener);
+//
+//		// Initialize the send button with a listener that for click events
+//		mSendButton = (Button) findViewById(R.id.button_send);
+//		mSendButton.setOnClickListener(new OnClickListener() {
+//			public void onClick(View v) {
+//				// Send a message using content of the edit text widget
+//				TextView view = (TextView) findViewById(R.id.edit_text_out);
+//				String message = view.getText().toString();
+//				sendMessage(message);
+//			}
+//		});
 
 		// Initialize the BluetoothChatService to perform bluetooth connections
 		mChatService = new BluetoothChatService(this, mHandler);
@@ -286,7 +290,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 			// Reset out string buffer to zero and clear the edit text field
 			mOutStringBuffer.setLength(0);
-			mOutEditText.setText(mOutStringBuffer);
+//			mOutEditText.setText(mOutStringBuffer);
 		}
 	}
 
@@ -327,16 +331,21 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 					Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
 				switch (msg.arg1) {
 				case BluetoothChatService.STATE_CONNECTED:
-					setStatus(getString(R.string.title_connected_to,
-							mConnectedDeviceName));
+//					setStatus(getString(R.string.title_connected_to,
+//							mConnectedDeviceName));
+					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.bt_conn);
+					((TextView) findViewById(R.id.bconnto)).setText(mConnectedDeviceName.toString());
 					mConversationArrayAdapter.clear();
 					break;
 				case BluetoothChatService.STATE_CONNECTING:
-					setStatus(R.string.title_connecting);
+//					setStatus(R.string.title_connecting);
+					((TextView) findViewById(R.id.bstatus)).setText(R.string.title_connecting);
 					break;
 				case BluetoothChatService.STATE_LISTEN:
 				case BluetoothChatService.STATE_NONE:
-					setStatus(R.string.title_not_connected);
+//					setStatus(R.string.title_not_connected);
+					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.bt_notconn);
+					((TextView) findViewById(R.id.bconnto)).setText(null);
 					break;
 				}
 				break;
@@ -356,14 +365,14 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			case MESSAGE_DEVICE_NAME:
 				// save the connected device's name
 				mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-				Toast.makeText(getApplicationContext(),
-						"Connected to " + mConnectedDeviceName,
-						Toast.LENGTH_SHORT).show();
+//				Toast.makeText(getApplicationContext(),
+//						"Connected to " + mConnectedDeviceName,
+//						Toast.LENGTH_SHORT).show();
 				break;
 			case MESSAGE_TOAST:
-				Toast.makeText(getApplicationContext(),
-						msg.getData().getString(TOAST), Toast.LENGTH_SHORT)
-						.show();
+//				Toast.makeText(getApplicationContext(),
+//						msg.getData().getString(TOAST), Toast.LENGTH_SHORT)
+//						.show();
 				break;
 			}
 		}
@@ -377,12 +386,6 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			// When DeviceListActivity returns with a device to connect
 			if (resultCode == Activity.RESULT_OK) {
 				connectDevice(data, true);
-			}
-			break;
-		case REQUEST_CONNECT_DEVICE_INSECURE:
-			// When DeviceListActivity returns with a device to connect
-			if (resultCode == Activity.RESULT_OK) {
-				connectDevice(data, false);
 			}
 			break;
 		case REQUEST_ENABLE_BT:
@@ -426,18 +429,38 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			serverIntent = new Intent(this, DeviceListActivity.class);
 			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 			return true;
-		case R.id.insecure_connect_scan:
-			// Launch the DeviceListActivity to see devices and do scan
-			serverIntent = new Intent(this, DeviceListActivity.class);
-			startActivityForResult(serverIntent,
-					REQUEST_CONNECT_DEVICE_INSECURE);
-			return true;
 		case R.id.discoverable:
 			// Ensure this device is discoverable by others
 			ensureDiscoverable();
 			return true;
+		case R.id.help_button: 
+			build_help_dialog();
+			return true;
 		}
 		return false;
+	}
+	
+	public void build_help_dialog() {
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+	
+			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			        	   dialog.cancel();
+			           }
+			       });
+	
+			TextView titleText = new TextView(getBaseContext());
+			titleText.setText(R.string.info_title);
+			titleText.setGravity(Gravity.CENTER);
+			titleText.setTextSize(20);
+			
+			builder.setMessage(R.string.info);
+			builder.setCustomTitle(titleText);
+			
+			AlertDialog dialog = builder.create();
+			dialog.show();
+			
 	}
 
 	@Override
