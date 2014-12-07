@@ -339,7 +339,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 					break;
 				case BluetoothChatService.STATE_CONNECTING:
 //					setStatus(R.string.title_connecting);
-					((TextView) findViewById(R.id.bstatus)).setText(R.string.title_connecting);
+					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.title_connecting);
 					break;
 				case BluetoothChatService.STATE_LISTEN:
 				case BluetoothChatService.STATE_NONE:
