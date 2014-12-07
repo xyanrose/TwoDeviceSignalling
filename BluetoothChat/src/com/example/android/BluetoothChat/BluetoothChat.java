@@ -16,6 +16,8 @@
 
 package com.example.android.BluetoothChat;
 
+import java.util.HashMap;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -89,6 +91,10 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	private BluetoothChatService mChatService = null;
 
 	// Accelerometer
+	private final String START_RECORDING = "START_RECORDING";
+	private final String STOP_RECORDING = "STOP_RECORDING";
+	private String slaveString;
+	private Button ultraButton2001;
 	private SensorManager manager;
 	private Sensor accelerometer;
 	StringBuilder builder = new StringBuilder();
@@ -96,7 +102,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	String direction;
 	private AsyncTask asyncTask = null;
 	boolean buttonDepressed = false;
-	String daString;
+	String masterString;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -117,33 +123,34 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		Sensor accelerometer = manager.getSensorList(Sensor.TYPE_ACCELEROMETER)
 				.get(0);
 		manager.registerListener(this, accelerometer,
-				SensorManager.SENSOR_DELAY_FASTEST);
+				SensorManager.SENSOR_DELAY_NORMAL);
 
 		// button
-		Button b = (Button) findViewById(R.id.ultraButton2001);
+		ultraButton2001 = (Button) findViewById(R.id.ultraButton2001);
 		direction = "";
 
-		b.setOnTouchListener(new OnTouchListener() {
+		ultraButton2001.setOnTouchListener(new OnTouchListener() {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+					Toast.makeText(BluetoothChat.this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+					return false;
+				}
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					daString ="";
+					masterString ="";
 					buttonDepressed =true;
+					sendMessage(START_RECORDING);
 					startTask();
 					
 				}
 			    if (event.getAction() == MotionEvent.ACTION_UP) {
 					buttonDepressed = false;	
-					sendMessage(daString);
-					Log.d("XYAN", daString);
-					daString = "";
+					sendMessage(STOP_RECORDING);
+					
 				}
 
-					
-
-				
-				return false;
+				return true;
 			}
 
 		});
@@ -350,8 +357,31 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 				byte[] readBuf = (byte[]) msg.obj;
 				// construct a string from the valid bytes in the buffer
 				String readMessage = new String(readBuf, 0, msg.arg1);
-				mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
-						+ readMessage);
+				/*if this device receives the message START_RECORDING, then
+				 * the record button the other device has been touched first,
+				 * and we should disable the button on this device and begin
+				 * recording until further notice from the other device*/
+				if (readMessage.equals(START_RECORDING)){
+					ultraButton2001.setEnabled(false);
+					buttonDepressed = true;
+					BluetoothChat.this.startTask();
+				}else if(readMessage.equals(STOP_RECORDING)){
+					ultraButton2001.setEnabled(true);
+					buttonDepressed = false;
+					/*must process the data before sending to avoid sending
+					 * in multiple packets*/
+					masterString = BluetoothChat.this.getMostFrequentDirection(masterString);
+					BluetoothChat.this.sendMessage(masterString);
+				/* the only other communication should be the slave phone sending it's data
+				 * back to the master phone. The code below is run by the master.*/
+				}else{
+					
+					//this should be a single direction
+					slaveString = readMessage;
+					BluetoothChat.this.displaySemaphore(masterString, slaveString);
+				}
+				//mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
+				//		+ readMessage);
 				break;
 			case MESSAGE_DEVICE_NAME:
 				// save the connected device's name
@@ -398,6 +428,156 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 				finish();
 			}
 		}
+	}
+	
+	private String getMostFrequentDirection(String directions){
+		//split strings into array by comma separation
+		String[] masterArr = directions.split(",");
+		HashMap<String, Integer> h1 = new HashMap<String,Integer>();
+		
+		//get most common direction for master
+		for (String s:masterArr){
+			if (h1.containsKey(s)){
+				h1.put(s, h1.get(s)+1);
+			}else{
+				h1.put(s, 1);
+			}
+		}
+		int max = 0;
+		String returnString = "";
+		for (String s: h1.keySet()){
+			if(h1.get(s)>max){
+				max = h1.get(s);
+				returnString = s;
+			}
+		}
+		return returnString;
+		
+	}
+
+	protected void displaySemaphore(String masterString2, String slaveString2) {
+		/*masterString still has to be processed*/
+		masterString = getMostFrequentDirection(masterString2);
+		/*slaveString was processed before sending from slave phone*/
+		slaveString = slaveString2;
+		
+		Toast.makeText(this, masterString,
+				Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, slaveString,
+				Toast.LENGTH_SHORT).show();
+		String switchVar = masterString+" "+slaveString;
+		//right hand master, left hand slave
+		if (switchVar.equals("SE S")){
+			//A
+			Toast.makeText(this, "A",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("E S")){
+			//B
+			Toast.makeText(this, "B",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("NE S")){
+			//C
+			Toast.makeText(this, "C",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("N S")){
+			//D
+			Toast.makeText(this, "D",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("S NW")){
+			//E
+			Toast.makeText(this, "E",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("S W")){
+			//F
+			Toast.makeText(this, "F",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("S SW")){
+			//G
+			Toast.makeText(this, "G",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("E SE")){
+			//H
+			Toast.makeText(this, "H",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("SE NE")){
+			//I
+			Toast.makeText(this, "I",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("N W")){
+			//J
+			Toast.makeText(this, "J",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("SE N")){
+			//K
+			Toast.makeText(this, "K",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("SE NW")){
+			//L
+			Toast.makeText(this, "L",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("SE W")){
+			//M
+			Toast.makeText(this, "M",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("SE SW")){
+			//N
+			Toast.makeText(this, "N",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("E NE")){
+			//O
+			Toast.makeText(this, "O",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("E N")){
+			//P
+			Toast.makeText(this, "P",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("E NW")){
+			//Q
+			Toast.makeText(this, "Q",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("E W")){
+			//R
+			Toast.makeText(this, "R",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("E SW")){
+			//S
+			Toast.makeText(this, "S",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("NE N")){
+			//T
+			Toast.makeText(this, "T",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("NE NW")){
+			//U
+			Toast.makeText(this, "U",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("N SW")){
+			//V
+			Toast.makeText(this, "V",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("NW W")){
+			//W
+			Toast.makeText(this, "W",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("NW SW")){
+			//X
+			Toast.makeText(this, "X",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("NE W")){
+			//Y
+			Toast.makeText(this, "Y",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("SW W")){
+			//Z
+			Toast.makeText(this, "Z",
+					Toast.LENGTH_SHORT).show();
+		}else if(switchVar.equals("S S")){
+			//Space
+			Toast.makeText(this, "Space",
+					Toast.LENGTH_SHORT).show();
+		}
+		
+		
 	}
 
 	private void connectDevice(Intent data, boolean secure) {
@@ -477,12 +657,15 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	}
 
 	public void startTask() {
+		
 		asyncTask = new AsyncTask<Void, Void, Void>() {
+			
 			@Override
 			protected Void doInBackground(Void... params) {
+				
 				if (buttonDepressed) {
 					while (buttonDepressed) {
-						daString+=", "+direction;
+						masterString+=","+direction;
 					}
 				}
 				return null;
