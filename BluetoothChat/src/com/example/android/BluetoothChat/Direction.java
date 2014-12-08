@@ -60,7 +60,6 @@ public class Direction {
 				result += "E";
 			}
 			
-			lastResult = result;
 			return result;
 			
 		}
