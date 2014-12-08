@@ -1,6 +1,8 @@
-package com.example.android.BluetoothChat;
+package com.example.android.FlagSemaphoring;
 
 import java.io.IOException;
+
+import com.example.android.BluetoothChat.R;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;

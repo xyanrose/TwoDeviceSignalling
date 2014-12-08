@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.example.android.BluetoothChat;
+package com.example.android.FlagSemaphoring;
 
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
+
+import com.example.android.BluetoothChat.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,9 +55,9 @@ import android.media.MediaPlayer;
 /**
  * This is the main Activity that displays the current chat session.
  */
-public class BluetoothChat extends Activity implements SensorEventListener {
+public class FlagSemaphoring extends Activity implements SensorEventListener {
 	// Debugging stuff
-	private static final String TAG = "BluetoothChat";
+	private static final String TAG = "Flag Semaphoring";
 	private static final boolean D = true;
 
 	// Message types sent from the BluetoothChatService Handler //
@@ -336,14 +338,14 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 					}
 					ultraButton2001.setEnabled(false);
 					buttonDepressed = true;
-					BluetoothChat.this.startTask();
+					FlagSemaphoring.this.startTask();
 				}else if(readMessage.equals(STOP_RECORDING)){
 					ultraButton2001.setEnabled(true);
 					buttonDepressed = false;
 					/*must process the data before sending to avoid sending
 					 * in multiple packets*/
 					masterString = record.getDirection();
-					BluetoothChat.this.sendMessage(masterString);
+					FlagSemaphoring.this.sendMessage(masterString);
 					record.clearRecords();
 					/* the only other communication should be the slave phone sending it's data
 					 * back to the master phone. The code below is run by the master.*/
@@ -351,7 +353,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 					//this should be a single direction
 					slaveString = readMessage;
-					BluetoothChat.this.displaySemaphore();
+					FlagSemaphoring.this.displaySemaphore();
 				}
 				break;
 			case MESSAGE_DEVICE_NAME:
@@ -548,7 +550,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			//build_semaphore_dialog();
 			//return true;
 		case R.id.semaphore_button:
-			Intent sem = new Intent(BluetoothChat.this, Semaphores.class);
+			Intent sem = new Intent(FlagSemaphoring.this, Semaphores.class);
 			this.startActivity(sem);
 		}
 		return false;
@@ -556,7 +558,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 	public void build_help_general_initial_dialog() {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(FlagSemaphoring.this);
 
 		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
@@ -579,7 +581,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 	public void build_help_general_dialog() {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(FlagSemaphoring.this);
 
 		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
@@ -601,7 +603,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	}
 	public void build_what_is_a_flag_semaphore_dialog() {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(FlagSemaphoring.this);
 
 		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
@@ -624,7 +626,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 	public void build_help_detection_dialog() {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(FlagSemaphoring.this);
 
 		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
@@ -647,7 +649,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	
 	public void build_semaphore_dialog() {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(FlagSemaphoring.this);
 
 		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {

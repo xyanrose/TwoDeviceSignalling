@@ -1,4 +1,4 @@
-package com.example.android.BluetoothChat;
+package com.example.android.FlagSemaphoring;
 
 import java.util.ArrayList;
 
