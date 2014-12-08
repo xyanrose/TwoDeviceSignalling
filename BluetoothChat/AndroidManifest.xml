@@ -36,5 +36,9 @@
                   android:label="@string/select_device"
                   android:theme="@android:style/Theme.Holo.Dialog"
                   android:screenOrientation="portrait" />
+        <activity android:label="@string/sem_activity"
+            	  android:name="Semaphores"
+            	  android:theme="@android:style/Theme.Holo.Dialog"
+                  android:screenOrientation="portrait" />
     </application>
 </manifest>

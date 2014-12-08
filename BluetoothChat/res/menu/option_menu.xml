@@ -22,8 +22,20 @@
           android:icon="@android:drawable/ic_menu_mylocation"
           android:title="@string/discoverable"
           android:showAsAction="ifRoom|withText" />
-     <item android:id="@+id/help_button"
+     <item android:id="@+id/help_button_general"
           android:icon="@android:drawable/ic_menu_help"
-          android:title="@string/help"
+          android:title="@string/general_how_to"
+          android:showAsAction="ifRoom|withText" />
+     <item android:id="@+id/help_button_detection"
+          android:icon="@android:drawable/ic_menu_help"
+          android:title="@string/help_detection"
+          android:showAsAction="ifRoom|withText" />
+     <item android:id="@+id/what_is_a_flag_semaphore_button"
+          android:icon="@android:drawable/ic_menu_help"
+          android:title="@string/what_is_a_flag_semaphore_title"
+          android:showAsAction="ifRoom|withText" />
+     <item android:id="@+id/semaphore_button"
+          android:icon="@android:drawable/ic_menu_help"
+          android:title="@string/semaphore_title"
           android:showAsAction="ifRoom|withText" />
 </menu>

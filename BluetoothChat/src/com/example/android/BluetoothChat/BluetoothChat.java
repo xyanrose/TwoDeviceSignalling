@@ -17,6 +17,7 @@
 package com.example.android.BluetoothChat;
 
 import java.io.IOException;
+import java.util.concurrent.Semaphore;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -80,7 +81,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	private BluetoothAdapter mBluetoothAdapter = null;
 	// Member object for the chat services
 	private BluetoothChatService mChatService = null;
-	
+
 	private AsyncTask<Void, Void, Void> asyncTask = null;
 
 	// Accelerometer
@@ -93,10 +94,10 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	String direction;
 	boolean buttonDepressed = false;
 	String masterString;
-	
+
 	// Direction data
 	Direction record;
-	
+
 	// Sound
 	MediaPlayer media_connected = null;
 	MediaPlayer media_start = null;
@@ -105,14 +106,14 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
+
 		media_connected = MediaPlayer.create(this, R.raw.connected);
 		media_start = MediaPlayer.create(this, R.raw.start);
 		media_detected = MediaPlayer.create(this, R.raw.flagdetected);
 		media_error = MediaPlayer.create(this, R.raw.error_sound);
-		
+
 		record = new Direction();
-		
+
 		super.onCreate(savedInstanceState);
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 		if (D)
@@ -140,28 +141,28 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				
-				
-				
+
+
+
 				if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
 					media_error.start();
 					return false;
 				}
-				
+
 				media_start.start();
-				
+
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					masterString ="";
 					record.clearRecords();
 					buttonDepressed =true;
 					sendMessage(START_RECORDING);
 					startTask();
-					
+
 				}
-			    if (event.getAction() == MotionEvent.ACTION_UP) {
+				if (event.getAction() == MotionEvent.ACTION_UP) {
 					buttonDepressed = false;	
 					sendMessage(STOP_RECORDING);
-					
+
 				}
 
 				return true;
@@ -181,7 +182,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		build_help_dialog();
+		build_help_general_initial_dialog();
 	}
 
 	@Override
@@ -289,7 +290,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 			// Reset out string buffer to zero and clear the edit text field
 			mOutStringBuffer.setLength(0);
-//			mOutEditText.setText(mOutStringBuffer);
+			//			mOutEditText.setText(mOutStringBuffer);
 		}
 	}
 
@@ -344,10 +345,10 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 					masterString = record.getDirection();
 					BluetoothChat.this.sendMessage(masterString);
 					record.clearRecords();
-				/* the only other communication should be the slave phone sending it's data
-				 * back to the master phone. The code below is run by the master.*/
+					/* the only other communication should be the slave phone sending it's data
+					 * back to the master phone. The code below is run by the master.*/
 				}else{
-					
+
 					//this should be a single direction
 					slaveString = readMessage;
 					BluetoothChat.this.displaySemaphore();
@@ -389,11 +390,11 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	}
 
 	protected void displaySemaphore() {
-		
+
 		masterString = record.getDirection();
-		
+
 		String switchVar = masterString+" "+slaveString;
-		
+
 		String result = "";
 		//right hand master, left hand slave
 		if (switchVar.equals("SE S")){
@@ -484,7 +485,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			//Space
 			result = "cancel";
 		}
-		
+
 		if(!result.equals("")) {
 			media_detected.start();
 			try {
@@ -501,7 +502,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
 
 	private void connectDevice(Intent data, boolean secure) {
@@ -534,34 +535,139 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			// Ensure this device is discoverable by others
 			ensureDiscoverable();
 			return true;
-		case R.id.help_button: 
-			build_help_dialog();
+		case R.id.help_button_general: 
+			build_help_general_dialog();
 			return true;
+		case R.id.help_button_detection:
+			build_help_detection_dialog();
+			return true;
+		case R.id.what_is_a_flag_semaphore_button:
+			build_what_is_a_flag_semaphore_dialog();
+			return true;
+		//case R.id.semaphore_button:
+			//build_semaphore_dialog();
+			//return true;
+		case R.id.semaphore_button:
+			Intent sem = new Intent(BluetoothChat.this, Semaphores.class);
+			this.startActivity(sem);
 		}
 		return false;
 	}
+
+	public void build_help_general_initial_dialog() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+
+		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
+
+		TextView titleText = new TextView(getBaseContext());
+		titleText.setText(R.string.how_to_use_title);
+		titleText.setGravity(Gravity.CENTER);
+		titleText.setTextSize(20);
+
+		builder.setMessage(R.string.initial_info);
+		builder.setCustomTitle(titleText);
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
+
+	}
+
+	public void build_help_general_dialog() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+
+		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
+
+		TextView titleText = new TextView(getBaseContext());
+		titleText.setText(R.string.how_to_use_title);
+		titleText.setGravity(Gravity.CENTER);
+		titleText.setTextSize(20);
+
+		builder.setMessage(R.string.how_to_use_info);
+		builder.setCustomTitle(titleText);
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
+
+	}
+	public void build_what_is_a_flag_semaphore_dialog() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+
+		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
+
+		TextView titleText = new TextView(getBaseContext());
+		titleText.setText(R.string.what_is_a_flag_semaphore_title);
+		titleText.setGravity(Gravity.CENTER);
+		titleText.setTextSize(20);
+
+		builder.setMessage(R.string.what_is_a_flag_semaphore_info);
+		builder.setCustomTitle(titleText);
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
+
+	}
+
+	public void build_help_detection_dialog() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+
+		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
+
+		TextView titleText = new TextView(getBaseContext());
+		titleText.setText(R.string.detection_help_title);
+		titleText.setGravity(Gravity.CENTER);
+		titleText.setTextSize(20);
+
+		builder.setMessage(R.string.detection_help_info);
+		builder.setCustomTitle(titleText);
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
+
+	}
 	
-	public void build_help_dialog() {
-			
-			AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
-	
-			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			        	   dialog.cancel();
-			           }
-			       });
-	
-			TextView titleText = new TextView(getBaseContext());
-			titleText.setText(R.string.info_title);
-			titleText.setGravity(Gravity.CENTER);
-			titleText.setTextSize(20);
-			
-			builder.setMessage(R.string.info);
-			builder.setCustomTitle(titleText);
-			
-			AlertDialog dialog = builder.create();
-			dialog.show();
-			
+	public void build_semaphore_dialog() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothChat.this);
+
+		builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
+
+		ImageView sema = new ImageView(getBaseContext());
+		try {
+			sema.setImageBitmap(BitmapFactory.decodeStream(getAssets().open("Semaphore_Signals_A-Z.png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		builder.setCustomTitle(sema);
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
+
 	}
 
 	@Override
@@ -570,25 +676,25 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		float yChange = history[1] - event.values[1];
 
 		double sensitivity = 0.3;
-		
+
 		if(buttonDepressed && xChange > sensitivity || yChange > sensitivity) {
 			record.addRecord(event.values);
 		}
-		
+
 		if(!record.getRecords().isEmpty()) {
 			Log.d(TAG, record.getDirection());
 		}
-		
+
 	}
 
 	public void startTask() {
-		
+
 		asyncTask = new AsyncTask<Void, Void, Void>() {
-			
+
 			@Override
 			protected Void doInBackground(Void... params) {
 				masterString = "";
-				
+
 				if (buttonDepressed) {
 					record.clearRecords();
 					while (buttonDepressed) {
@@ -604,7 +710,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

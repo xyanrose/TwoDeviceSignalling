@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2009 The Android Open Source Project
+<!--
+     Copyright (C) 2009 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,12 +16,14 @@
 -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Bluetooth Chat</string>
 
-    <!--  BluetoothChat -->
+    <string name="app_name">Bluetooth Chat</string>
+    <string name="sem_activity">Semaphores</string>
+
+    <!-- BluetoothChat -->
     <string name="bt_not_enabled_leaving">Bluetooth not enabled, exiting.</string>
 
-    <!--  DeviceListActivity -->
+    <!-- DeviceListActivity -->
     <string name="scanning">Scanning for devices</string>
     <string name="select_device">Select a device to connect</string>
     <string name="none_paired">No devices have been paired</string>
@@ -32,12 +35,19 @@
     <!-- Options Menu -->
     <string name="secure_connect">Connect to Device</string>
     <string name="discoverable">Make Discoverable</string>
-    
-    <!--  Misc -->
-    <string name="help">Help</string>
+
+    <!-- Misc -->
+    <string name="general_how_to">General How-To</string>
+    <string name="help_detection">Help With Detection</string>
     <string name="ok">OK</string>
-    <string name="info_title">Information</string>
-    <string name="info">This application is designed to help users test their knowledge of the flag semaphore system.\n\nTo use:\n1) Install this application on two Android devices.\n2) Pair them using this application.\n3) To record a flag semaphore, put the two devices together and press the record button on the right-hand device.\n4) Move the devices to their respective positions as if they were the two flags, then release the record button.</string>
+    <string name="how_to_use_title">How To Use</string>
+    <string name="initial_info">This application is designed to help users test their knowledge of the flag semaphore system.\n\nIn order to use this application, the following requirements must be met:\n\n1) You must possess two Android devices of software version 3.0 (Honeycomb) or greater.\n\n2) Both devices must possess Bluetooth capabilities.\n\n3) Both devices must possess an accelerometer.\n\nFor any additional concerns or questions, please see the options menu. There you will find help topics on both how to use the device and the flag semaphore system.</string>
+    <string name="how_to_use_info">To Use:\n\n1) Please ensure that this application is installed on two separate android devices.\n\n2) When installed, pair both devices using this application.\n\n3) To record a semaphore, press and hold the “Begin Recording” button on the device in your right hand.\n\n4) Move the devices to the desired flag positions. Ensure you maintain an even speed and keep the devices as close to parallel with each other as possible.\n\n5) Right before you stop moving, let go of the button.\n\n6) The semaphore that was made will be displayed on the screen.\n\nFor more help, see the action bar.</string>
+    <string name="detection_help_title">Detection of Semaphore Help</string>
+    <string name="detection_help_info">If the app does not seem to be detecting your semaphores correctly, please ensure the following are true:\n\n1) You are moving at an even speed and keeping the devices as close to parallel with each other as possible.\n\n2) The devices are linked to each other via Bluetooth.\n\n3) You are pressing the record button on the phone in your RIGHT hand.\n\n4) You are releasing the button BEFORE you stop moving. Due to the way accelerometers work, if you release at button as you stop, it counts as you moving in the OPPOSITE direction and messes up the app\'s calculations.</string>
+    <string name="what_is_a_flag_semaphore_title">What is a Flag Semaphore?</string>
+    <string name="what_is_a_flag_semaphore_info">The flag semaphore system is a system in which information is conveyed at a distinance through the use of visual signals.\n\nThese signals are obtained through the use of hand-held flags, rods, or even gloved hands.\n\nThe information being conveyed is determined by the positions of the objects being held.</string>
+    <string name="semaphore_title">Semaphore List</string>
     <string name="action_settings">Settings</string>
     <string name="bt_status">Bluetooth Status:</string>
     <string name="bt_conn">CONNECTED</string>
@@ -48,4 +58,5 @@
     <string name="bt_conn_button">Connect to Device</string>
     <string name="record">Begin Recording</string>
     <string name="flag">Flag Detected:</string>
+
 </resources>
