@@ -19,7 +19,6 @@ package com.example.android.BluetoothChat;
 import java.io.IOException;
 import java.util.HashMap;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -28,7 +27,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -39,7 +37,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -47,13 +44,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
-import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,9 +72,6 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
 	private static final int REQUEST_ENABLE_BT = 3;
 
-	// Layout Views
-	private Button mSendButton;
-
 	// Name of the connected device
 	private String mConnectedDeviceName = null;
 	// String buffer for outgoing messages
@@ -91,23 +80,27 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	private BluetoothAdapter mBluetoothAdapter = null;
 	// Member object for the chat services
 	private BluetoothChatService mChatService = null;
+	
+	private AsyncTask<Void, Void, Void> asyncTask = null;
 
 	// Accelerometer
 	private final String START_RECORDING = "START_RECORDING";
 	private final String STOP_RECORDING = "STOP_RECORDING";
 	private String slaveString;
 	private Button ultraButton2001;
-	private SensorManager manager;
-	private Sensor accelerometer;
 	StringBuilder builder = new StringBuilder();
 	float[] history = new float[2];
 	String direction;
-	private AsyncTask asyncTask = null;
 	boolean buttonDepressed = false;
 	String masterString;
+	
+	Direction record;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
+		record = new Direction();
+		
 		super.onCreate(savedInstanceState);
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 		if (D)
@@ -135,12 +128,15 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				
+				
+				
 				if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-					Toast.makeText(BluetoothChat.this, R.string.not_connected, Toast.LENGTH_SHORT).show();
 					return false;
 				}
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					masterString ="";
+					record.clearRecords();
 					buttonDepressed =true;
 					sendMessage(START_RECORDING);
 					startTask();
@@ -176,7 +172,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	public void onStart() {
 		super.onStart();
 		if (D)
-			Log.e(TAG, "++ ON START ++");
+			Log.e(TAG, "START");
 
 		// If BT is not on, request that it be enabled.
 		// setupChat() will then be called during onActivityResult
@@ -187,7 +183,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			// Otherwise, setup the chat session
 		} else {
 			if (mChatService == null) {
-				setupChat();
+				setupBT();
 			}
 		}
 	}
@@ -212,29 +208,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		}
 	}
 
-	private void setupChat() {
-//		Log.d(TAG, "setupChat()");
-
-		// Initialize the array adapter for the conversation thread
-//		mConversationArrayAdapter = new ArrayAdapter<String>(this,
-//				R.layout.message);
-//		mConversationView = (ListView) findViewById(R.id.in);
-//		mConversationView.setAdapter(mConversationArrayAdapter);
-
-//		// Initialize the compose field with a listener for the return key
-//		mOutEditText = (EditText) findViewById(R.id.edit_text_out);
-//		mOutEditText.setOnEditorActionListener(mWriteListener);
-//
-//		// Initialize the send button with a listener that for click events
-//		mSendButton = (Button) findViewById(R.id.button_send);
-//		mSendButton.setOnClickListener(new OnClickListener() {
-//			public void onClick(View v) {
-//				// Send a message using content of the edit text widget
-//				TextView view = (TextView) findViewById(R.id.edit_text_out);
-//				String message = view.getText().toString();
-//				sendMessage(message);
-//			}
-//		});
+	private void setupBT() {
 
 		// Initialize the BluetoothChatService to perform bluetooth connections
 		mChatService = new BluetoothChatService(this, mHandler);
@@ -288,8 +262,6 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	private void sendMessage(String message) {
 		// Check that we're actually connected before trying anything
 		if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-			Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT)
-					.show();
 			return;
 		}
 
@@ -305,33 +277,6 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		}
 	}
 
-	// The action listener for the EditText widget, to listen for the return key
-	private TextView.OnEditorActionListener mWriteListener = new TextView.OnEditorActionListener() {
-		public boolean onEditorAction(TextView view, int actionId,
-				KeyEvent event) {
-			// If the action is a key-up event on the return key, send the
-			// message
-			if (actionId == EditorInfo.IME_NULL
-					&& event.getAction() == KeyEvent.ACTION_UP) {
-				String message = view.getText().toString();
-				sendMessage(message);
-			}
-			if (D)
-				Log.i(TAG, "END onEditorAction");
-			return true;
-		}
-	};
-
-	private final void setStatus(int resId) {
-		final ActionBar actionBar = getActionBar();
-		actionBar.setSubtitle(resId);
-	}
-
-	private final void setStatus(CharSequence subTitle) {
-		final ActionBar actionBar = getActionBar();
-		actionBar.setSubtitle(subTitle);
-	}
-
 	// The Handler that gets information back from the BluetoothChatService
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -342,27 +287,20 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 					Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
 				switch (msg.arg1) {
 				case BluetoothChatService.STATE_CONNECTED:
-//					setStatus(getString(R.string.title_connected_to,
-//							mConnectedDeviceName));
 					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.bt_conn);
 					((TextView) findViewById(R.id.bconnto)).setText(mConnectedDeviceName.toString());
 					break;
 				case BluetoothChatService.STATE_CONNECTING:
-//					setStatus(R.string.title_connecting);
-					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.title_connecting);
+					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.bt_conning);
 					break;
 				case BluetoothChatService.STATE_LISTEN:
 				case BluetoothChatService.STATE_NONE:
-//					setStatus(R.string.title_not_connected);
 					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.bt_notconn);
 					((TextView) findViewById(R.id.bconnto)).setText(null);
 					break;
 				}
 				break;
 			case MESSAGE_WRITE:
-				byte[] writeBuf = (byte[]) msg.obj;
-				// construct a string from the buffer
-				String writeMessage = new String(writeBuf);
 				break;
 			case MESSAGE_READ:
 				byte[] readBuf = (byte[]) msg.obj;
@@ -373,6 +311,11 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 				 * and we should disable the button on this device and begin
 				 * recording until further notice from the other device*/
 				if (readMessage.equals(START_RECORDING)){
+					try {
+						((ImageView) findViewById(R.id.flag_detected)).setImageBitmap(BitmapFactory.decodeStream(getAssets().open("base.png")));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					ultraButton2001.setEnabled(false);
 					buttonDepressed = true;
 					BluetoothChat.this.startTask();
@@ -381,30 +324,23 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 					buttonDepressed = false;
 					/*must process the data before sending to avoid sending
 					 * in multiple packets*/
-					masterString = BluetoothChat.this.getMostFrequentDirection(masterString);
+					masterString = record.getDirection();
 					BluetoothChat.this.sendMessage(masterString);
+					record.clearRecords();
 				/* the only other communication should be the slave phone sending it's data
 				 * back to the master phone. The code below is run by the master.*/
 				}else{
 					
 					//this should be a single direction
 					slaveString = readMessage;
-					BluetoothChat.this.displaySemaphore(masterString, slaveString);
+					BluetoothChat.this.displaySemaphore();
 				}
-				//mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
-				//		+ readMessage);
 				break;
 			case MESSAGE_DEVICE_NAME:
 				// save the connected device's name
 				mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-//				Toast.makeText(getApplicationContext(),
-//						"Connected to " + mConnectedDeviceName,
-//						Toast.LENGTH_SHORT).show();
 				break;
 			case MESSAGE_TOAST:
-//				Toast.makeText(getApplicationContext(),
-//						msg.getData().getString(TOAST), Toast.LENGTH_SHORT)
-//						.show();
 				break;
 			}
 		}
@@ -424,7 +360,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			// When the request to enable Bluetooth returns
 			if (resultCode == Activity.RESULT_OK) {
 				// Bluetooth is now enabled, so set up a chat session
-				setupChat();
+				setupBT();
 			} else {
 				// User did not enable Bluetooth or an error occurred
 				Log.d(TAG, "BT not enabled");
@@ -434,46 +370,13 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			}
 		}
 	}
-	
-	private String getMostFrequentDirection(String directions){
-		//split strings into array by comma separation
-		String[] masterArr = directions.split(",");
-		HashMap<String, Integer> h1 = new HashMap<String,Integer>();
-		
-		//get most common direction for master
-		int length = 0;
-		for (String s:masterArr){
-			length+=1;
-		}
-		for (int i = 0; i<length*.85;i++){
-			if (h1.containsKey(masterArr[i])){
-				h1.put(masterArr[i], h1.get(masterArr[i])+1);
-			}else{
-				h1.put(masterArr[i], 1);
-			}
-		}
-		int max = 0;
-		String returnString = "";
-		for (String s: h1.keySet()){
-			if(h1.get(s)>max && !s.equals("NONE")){
-				max = h1.get(s);
-				returnString = s;
-			}
-		}
-		return returnString;
-		
-	}
 
-	protected void displaySemaphore(String masterString2, String slaveString2) {
-		/*masterString still has to be processed*/
-		masterString = getMostFrequentDirection(masterString2);
-		/*slaveString was processed before sending from slave phone*/
-		slaveString = slaveString2;
+	protected void displaySemaphore() {
 		
-		Toast.makeText(this, "Right Hand: "+masterString,
-				Toast.LENGTH_SHORT).show();
-		Toast.makeText(this, "Left Hand: "+slaveString,
-				Toast.LENGTH_SHORT).show();
+		masterString = record.getDirection();
+		
+		Log.d("USING", "IM USING "+ record.getDirection() + ", SLAVE USING "+slaveString);
+		
 		String switchVar = masterString+" "+slaveString;
 		
 		String result = "";
@@ -640,41 +543,17 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		// TODO Auto-generated method stub
 		float xChange = history[0] - event.values[0];
 		float yChange = history[1] - event.values[1];
 
-		history[0] = event.values[0];
-		history[1] = event.values[1];
-		direction = "NONE";
-		double setting = .7;
-		if (xChange > setting) {
-			if (yChange > setting) {
-				direction = "NE";
-			} else if (yChange < -setting) {
-				direction = "SE";
-			} else {
-				direction = "E";
-			}
-		} else if (xChange < -setting) {
-			if (yChange > setting) {
-				direction = "NW";
-			} else if (yChange < -setting) {
-				direction = "SW";
-			} else {
-				direction = "W";
-			}
-		} else {
-			if (yChange > setting) {
-				direction = "N";
-			} else if (yChange < -setting) {
-				direction = "S";
-			} else {
-				// direction = "NONE";
-			}
+		double sensitivity = 0.3;
+		
+		if(buttonDepressed && xChange > sensitivity || yChange > sensitivity) {
+			record.addRecord(event.values);
 		}
-		if (!direction.equals("NONE")){
-			Log.d(TAG, direction);
+		
+		if(!record.getRecords().isEmpty()) {
+			Log.d(TAG, record.getDirection());
 		}
 		
 	}
@@ -688,6 +567,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 				masterString = "";
 				
 				if (buttonDepressed) {
+					record.clearRecords();
 					while (buttonDepressed) {
 						masterString+=","+direction;
 					}
@@ -701,7 +581,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

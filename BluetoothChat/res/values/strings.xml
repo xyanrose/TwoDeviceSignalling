@@ -18,35 +18,30 @@
     <string name="app_name">Bluetooth Chat</string>
 
     <!--  BluetoothChat -->
-    <string name="send">Send</string>
-    <string name="not_connected">You are not connected to a device</string>
-    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Leaving Bluetooth Chat.</string>
-    <string name="title_connecting">Connecting...</string>
-    <string name="title_connected_to">Connected to <xliff:g id="device_name">%1$s</xliff:g></string>
-    <string name="title_not_connected">Not connected</string>
+    <string name="bt_not_enabled_leaving">Bluetooth not enabled, exiting.</string>
 
     <!--  DeviceListActivity -->
-    <string name="scanning">Scanning for devices...</string>
+    <string name="scanning">Scanning for devices</string>
     <string name="select_device">Select a device to connect</string>
     <string name="none_paired">No devices have been paired</string>
-    <string name="none_found">No devices found</string>
+    <string name="none_found">No devices found.</string>
     <string name="title_paired_devices">Paired Devices</string>
     <string name="title_other_devices">Other Available Devices</string>
-    <string name="button_scan">Scan for devices</string>
+    <string name="button_scan">Scan for Devices</string>
 
     <!-- Options Menu -->
-    <string name="secure_connect">Connect a device</string>
-    <string name="discoverable">Make discoverable</string>
-    <string name="help_button_title">Help</string>
+    <string name="secure_connect">Connect to Device</string>
+    <string name="discoverable">Make Discoverable</string>
     
     <!--  Misc -->
     <string name="help">Help</string>
     <string name="ok">OK</string>
     <string name="info_title">Information</string>
-    <string name="info">This application is designed to help users test their knowledge of the flag semaphore system.\n\nTo use:\n1) Install this application on two Android devices.\n2) Pair them using this application.\n3) To record a flag semaphore, put the two devices together and press the record button on one device.\n4) Move the devices to their respective positions as if they were the two flags, then release the record button.</string>
+    <string name="info">This application is designed to help users test their knowledge of the flag semaphore system.\n\nTo use:\n1) Install this application on two Android devices.\n2) Pair them using this application.\n3) To record a flag semaphore, put the two devices together and press the record button on the right-hand device.\n4) Move the devices to their respective positions as if they were the two flags, then release the record button.</string>
     <string name="action_settings">Settings</string>
     <string name="bt_status">Bluetooth Status:</string>
     <string name="bt_conn">CONNECTED</string>
+    <string name="bt_conning">CONNECTING</string>
     <string name="bt_notconn">NOT CONNECTED</string>
     <string name="bt_connected_to_label">Connected Device:</string>
     <string name="bt_connected_to">[DEVICE ID]</string>
