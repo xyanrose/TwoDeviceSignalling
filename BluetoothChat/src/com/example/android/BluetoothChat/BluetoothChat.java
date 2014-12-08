@@ -375,8 +375,6 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		
 		masterString = record.getDirection();
 		
-		Log.d("USING", "IM USING "+ record.getDirection() + ", SLAVE USING "+slaveString);
-		
 		String switchVar = masterString+" "+slaveString;
 		
 		String result = "";
