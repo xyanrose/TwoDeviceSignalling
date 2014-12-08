@@ -69,10 +69,10 @@ public class Direction {
 				result += "N";
 			}
 			
-			if (avgX >= .7 && maxX >= 3) {
+			if (avgX >= .4 && maxX >= 2) {
 				result += "W";
 			}
-			else if (avgX < -.7 && minX <= -3) {
+			else if (avgX < -.4 && minX <= -2) {
 				result += "E";
 			}
 			

@@ -17,7 +17,6 @@
 package com.example.android.BluetoothChat;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -48,6 +47,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.media.MediaPlayer;
 
 /**
  * This is the main Activity that displays the current chat session.
@@ -94,17 +94,29 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 	boolean buttonDepressed = false;
 	String masterString;
 	
+	// Direction data
 	Direction record;
+	
+	// Sound
+	MediaPlayer media_connected = null;
+	MediaPlayer media_start = null;
+	MediaPlayer media_detected = null;
+	MediaPlayer media_error = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
+		media_connected = MediaPlayer.create(this, R.raw.connected);
+		media_start = MediaPlayer.create(this, R.raw.start);
+		media_detected = MediaPlayer.create(this, R.raw.flagdetected);
+		media_error = MediaPlayer.create(this, R.raw.error_sound);
 		
 		record = new Direction();
 		
 		super.onCreate(savedInstanceState);
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 		if (D)
-			Log.e(TAG, "+++ ON CREATE +++");
+			Log.e(TAG, "ONCREATE");
 
 		// Set up the window layout
 		setContentView(R.layout.main);
@@ -132,8 +144,12 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 				
 				
 				if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+					media_error.start();
 					return false;
 				}
+				
+				media_start.start();
+				
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					masterString ="";
 					record.clearRecords();
@@ -287,6 +303,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 					Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
 				switch (msg.arg1) {
 				case BluetoothChatService.STATE_CONNECTED:
+					media_connected.start();
 					((TextView) findViewById(R.id.bt_status_info)).setText(R.string.bt_conn);
 					((TextView) findViewById(R.id.bconnto)).setText(mConnectedDeviceName.toString());
 					break;
@@ -469,6 +486,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		}
 		
 		if(!result.equals("")) {
+			media_detected.start();
 			try {
 				((ImageView) findViewById(R.id.flag_detected)).setImageBitmap(BitmapFactory.decodeStream(getAssets().open(result+".png")));
 			} catch (IOException e) {
@@ -476,6 +494,7 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 			}
 		}
 		else {
+			media_error.start();
 			try {
 				((ImageView) findViewById(R.id.flag_detected)).setImageBitmap(BitmapFactory.decodeStream(getAssets().open("base.png")));
 			} catch (IOException e) {
