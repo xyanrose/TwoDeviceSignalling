@@ -1,4 +1,4 @@
-package com.example.android.FlagSemaphoring;
+package com.example.android.BluetoothChat;
 
 import java.io.IOException;
 

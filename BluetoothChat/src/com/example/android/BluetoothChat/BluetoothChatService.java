@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.FlagSemaphoring;
+package com.example.android.BluetoothChat;
 
 import java.io.IOException;
 import java.io.InputStream;
