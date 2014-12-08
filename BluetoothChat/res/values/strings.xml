@@ -17,7 +17,7 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <string name="app_name">Flag Semaphoring</string>
+    <string name="app_name">Semaphoring</string>
     <string name="sem_activity">Semaphores</string>
 
     <!-- BluetoothChat -->
