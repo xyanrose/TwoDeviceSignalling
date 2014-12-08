@@ -460,6 +460,12 @@ public class BluetoothChat extends Activity implements SensorEventListener {
 		}else if(switchVar.equals("S S")){
 			//Space
 			result = "space";
+		}else if(switchVar.equals("N NW")){
+			//Space
+			result = "numeral";
+		}else if(switchVar.equals("NE SW")){
+			//Space
+			result = "cancel";
 		}
 		
 		if(!result.equals("")) {
